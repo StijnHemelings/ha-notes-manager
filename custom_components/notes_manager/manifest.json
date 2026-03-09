@@ -1,7 +1,7 @@
 {
   "domain": "notes_manager",
   "name": "Notes Manager",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "documentation": "https://github.com/StijnHemelings/ha-notes-manager",
   "issue_tracker": "https://github.com/StijnHemelings/ha-notes-manager/issues",
   "codeowners": ["@StijnHemelings"],
