@@ -154,23 +154,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     hass.http.register_view(NotesView(hass))
     hass.http.register_view(NoteDetailView(hass))
 
-    # Register the panel (Lovelace dashboard card)
-    await _async_register_panel(hass)
-
     _LOGGER.info("Notes Manager integration loaded successfully")
     return True
-
-
-async def _async_register_panel(hass: HomeAssistant) -> None:
-    """Register the frontend panel."""
-    hass.components.frontend.async_register_built_in_panel(
-        component_name="iframe",
-        sidebar_title="Notities",
-        sidebar_icon="mdi:note-text",
-        frontend_url_path="notes-manager",
-        config={"url": "/api/notes_manager/panel"},
-        require_admin=False,
-    )
 
 
 from homeassistant.components.http import HomeAssistantView
