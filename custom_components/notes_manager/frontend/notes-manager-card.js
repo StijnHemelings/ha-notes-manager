@@ -3,7 +3,7 @@
  * v2.0.0 - With Markdown, Checklists, Images & Clickable Links
  */
 
-const CARD_VERSION = "2.1.2";
+const CARD_VERSION = "2.1.3";
 
 // Minimal Markdown renderer (bold, italic, headings, links, code)
 function renderMarkdown(text) {
@@ -149,10 +149,12 @@ class NotesManagerCard extends HTMLElement {
         .color-option:hover { transform:scale(1.2); }
         .color-option.selected { border-color:#1976d2 !important; }
         /* Checklist editor */
-        .checklist-editor { display:flex; flex-direction:column; gap:6px; }
-        .checklist-row { display:flex; align-items:center; gap:6px; }
-        .checklist-row input[type=text] { flex:1; min-width:0; padding:8px 10px; border:1px solid var(--divider-color,#ddd); border-radius:5px; font-size:.9em; background:#ffffff; color:#212121; box-sizing:border-box; font-family:inherit; }
-        .checklist-row button { background:none; border:none; cursor:pointer; font-size:18px; padding:4px 8px; border-radius:4px; min-width:36px; min-height:36px; display:flex; align-items:center; justify-content:center; }
+        .checklist-editor { display:flex; flex-direction:column; gap:8px; }
+        .checklist-row { display:flex; align-items:center; gap:8px; width:100%; }
+        .checklist-row input[type=checkbox] { flex-shrink:0; width:18px; height:18px; cursor:pointer; margin:0; }
+        .checklist-row input[type=text] { flex:1; min-width:0; padding:8px 10px; border:1px solid #aaa; border-radius:5px; font-size:.9em; background:#fff !important; color:#000 !important; box-sizing:border-box; font-family:inherit; outline:none; }
+        .checklist-row input[type=text]:focus { border-color:#1976d2; box-shadow:0 0 0 2px rgba(25,118,210,.2); }
+        .checklist-row button { flex-shrink:0; background:none; border:none; cursor:pointer; font-size:16px; padding:4px; border-radius:4px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; }
         .checklist-row button:hover { background:rgba(0,0,0,.1); }
         .add-item-btn { align-self:flex-start; background:none; border:1px dashed var(--primary-color); color:var(--primary-color); border-radius:6px; padding:5px 12px; cursor:pointer; font-size:.85em; margin-top:4px; }
         .add-item-btn:hover { background:rgba(25,118,210,.07); }
@@ -297,14 +299,27 @@ class NotesManagerCard extends HTMLElement {
       const editor = r.getElementById("checklist-editor");
       const row = document.createElement("div");
       row.className = "checklist-row";
-      row.innerHTML = `
-        <input type="checkbox" ${checked ? "checked" : ""} />
-        <input type="text" placeholder="Taak omschrijving..." value="${text.replace(/"/g,'&quot;')}" />
-        <button title="Verwijder">🗑️</button>
-      `;
-      row.querySelector("button").addEventListener("click", () => row.remove());
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = checked;
+
+      const inp = document.createElement("input");
+      inp.type = "text";
+      inp.placeholder = "Taak omschrijving...";
+      inp.value = text;
+      inp.style.cssText = "flex:1;min-width:0;padding:8px 10px;border:1px solid #aaa;border-radius:5px;font-size:.9em;background:#fff;color:#000;box-sizing:border-box;font-family:inherit;";
+
+      const btn = document.createElement("button");
+      btn.title = "Verwijder";
+      btn.textContent = "🗑️";
+      btn.addEventListener("click", () => row.remove());
+
+      row.appendChild(cb);
+      row.appendChild(inp);
+      row.appendChild(btn);
       editor.appendChild(row);
-      row.querySelector("input[type=text]").focus();
+      inp.focus();
     };
 
     const renderImagePreviews = () => {
