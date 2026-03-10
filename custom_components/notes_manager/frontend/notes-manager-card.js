@@ -3,7 +3,7 @@
  * v2.3.0 - Categories + Timezone fix
  */
 
-const CARD_VERSION = "2.3.0";
+const CARD_VERSION = "2.3.1";
 
 function renderMarkdown(text) {
   if (!text) return "";
@@ -275,9 +275,12 @@ class NotesManagerCard extends HTMLElement {
 
           <div class="form-group">
             <label>📁 Categorie</label>
-            <div class="category-input-wrap">
-              <input type="text" id="category-input" placeholder="Nieuwe categorie of kies bestaande..." list="category-list" />
-              <datalist id="category-list"></datalist>
+            <select id="category-select">
+              <option value="">— Geen categorie —</option>
+              <option value="__new__">➕ Nieuwe categorie...</option>
+            </select>
+            <div id="category-new-wrap" style="margin-top:6px;display:none;">
+              <input type="text" id="category-new-input" placeholder="Naam nieuwe categorie..." />
             </div>
           </div>
 
@@ -407,11 +410,28 @@ class NotesManagerCard extends HTMLElement {
       });
     };
 
-    // Update category datalist
-    const updateCategoryDatalist = () => {
-      const dl = r.getElementById("category-list");
-      dl.innerHTML = this._categories.map(c => `<option value="${c}">`).join("");
+    // Update category select
+    const updateCategorySelect = (selectedCat = "") => {
+      const sel = r.getElementById("category-select");
+      sel.innerHTML = `<option value="">— Geen categorie —</option>` +
+        this._categories.map(c => `<option value="${c}" ${c === selectedCat ? "selected" : ""}>${c}</option>`).join("") +
+        `<option value="__new__">➕ Nieuwe categorie...</option>`;
+      if (selectedCat && !this._categories.includes(selectedCat)) {
+        // it's a new category typed before
+        sel.value = "__new__";
+        r.getElementById("category-new-input").value = selectedCat;
+        r.getElementById("category-new-wrap").style.display = "block";
+      } else {
+        sel.value = selectedCat || "";
+        r.getElementById("category-new-wrap").style.display = "none";
+      }
     };
+
+    r.getElementById("category-select").addEventListener("change", () => {
+      const val = r.getElementById("category-select").value;
+      r.getElementById("category-new-wrap").style.display = val === "__new__" ? "block" : "none";
+      if (val === "__new__") setTimeout(() => r.getElementById("category-new-input").focus(), 50);
+    });
 
     // Open modal
     const openModal = (note = null) => {
@@ -425,7 +445,7 @@ class NotesManagerCard extends HTMLElement {
       r.getElementById("reminder-input").value = isoToLocalInput(note?.reminder);
       r.getElementById("checklist-editor").innerHTML = "";
       pendingImages = note?.images ? [...note.images] : [];
-      updateCategoryDatalist();
+      updateCategorySelect(note?.category || "");
       const type = note?.type || "text";
       updateTypeUI(type);
       updateColorUI(note?.color || "yellow");
@@ -479,7 +499,11 @@ class NotesManagerCard extends HTMLElement {
         checklist,
         images: [...pendingImages],
         pinned: r.getElementById("pin-input").checked,
-        category: r.getElementById("category-input").value.trim(),
+        category: (() => {
+          const sel = r.getElementById("category-select").value;
+          if (sel === "__new__") return r.getElementById("category-new-input").value.trim();
+          return sel;
+        })(),
         reminder: localInputToIso(reminderVal),
       };
       r.getElementById("note-modal").classList.remove("open");
