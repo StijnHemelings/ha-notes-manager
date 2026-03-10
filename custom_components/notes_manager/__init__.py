@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import shutil
 import uuid
 from typing import Any
 
@@ -82,6 +83,19 @@ def _save_notes(hass: HomeAssistant, data: dict) -> None:
         _LOGGER.error("Error saving notes: %s", e)
 
 
+
+def _copy_frontend(hass: HomeAssistant) -> None:
+    """Copy the frontend JS file to www/community on every startup."""
+    src = os.path.join(os.path.dirname(__file__), "frontend", "notes-manager-card.js")
+    dst_dir = hass.config.path("www", "community", "ha-notes-manager")
+    dst = os.path.join(dst_dir, "notes-manager-card.js")
+    try:
+        os.makedirs(dst_dir, exist_ok=True)
+        shutil.copy2(src, dst)
+        _LOGGER.info("Notes Manager: frontend JS copied to %s", dst)
+    except OSError as e:
+        _LOGGER.error("Notes Manager: failed to copy frontend JS: %s", e)
+
 def _build_note(body: dict, existing: dict | None = None) -> dict:
     now = dt_util.now().isoformat()
     if existing:
@@ -106,6 +120,7 @@ def _build_note(body: dict, existing: dict | None = None) -> dict:
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     hass.data.setdefault(DOMAIN, {})
+    _copy_frontend(hass)
 
     async def handle_add_note(call: ServiceCall) -> None:
         data = _load_notes(hass)

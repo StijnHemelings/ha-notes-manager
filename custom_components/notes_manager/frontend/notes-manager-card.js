@@ -3,7 +3,7 @@
  * v2.0.0 - With Markdown, Checklists, Images & Clickable Links
  */
 
-const CARD_VERSION = "2.1.1";
+const CARD_VERSION = "2.1.2";
 
 // Minimal Markdown renderer (bold, italic, headings, links, code)
 function renderMarkdown(text) {
