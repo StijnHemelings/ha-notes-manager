@@ -3,7 +3,7 @@
  * v2.3.0 - Categories + Timezone fix
  */
 
-const CARD_VERSION = "2.4.0";
+const CARD_VERSION = "2.5.0";
 
 function renderMarkdown(text) {
   if (!text) return "";
@@ -60,6 +60,45 @@ class NotesManagerCard extends HTMLElement {
   setConfig(config) {
     this._config = config || {};
     this._title = config?.title || "📝 Notities";
+    const l = config?.labels || {};
+    this._l = {
+      type_text:          l.type_text          || "📝 Tekst",
+      type_checklist:     l.type_checklist      || "✅ Checklist",
+      type_numbered:      l.type_numbered       || "🔢 Genummerd",
+      field_title:        l.field_title         || "Titel",
+      field_content:      l.field_content       || "Inhoud",
+      field_category:     l.field_category      || "📁 Categorie",
+      field_reminder:     l.field_reminder      || "⏰ Herinnering (optioneel)",
+      field_images:       l.field_images        || "Afbeeldingen",
+      field_color:        l.field_color         || "Kleur",
+      btn_save:           l.btn_save            || "Opslaan",
+      btn_cancel:         l.btn_cancel          || "Annuleren",
+      btn_add_task:       l.btn_add_task        || "+ Taak toevoegen",
+      btn_add_item:       l.btn_add_item        || "+ Item toevoegen",
+      pin_label:          l.pin_label           || "📌 Vastpinnen bovenaan",
+      no_category:        l.no_category         || "— Geen categorie —",
+      new_category:       l.new_category        || "➕ Nieuwe categorie...",
+      new_category_placeholder: l.new_category_placeholder || "Naam nieuwe categorie...",
+      category_placeholder: l.category_placeholder || "Naam nieuwe categorie...",
+      empty_state:        l.empty_state         || this._l.empty_state,
+      empty_search:       l.empty_search        || "Geen notities gevonden voor",
+      search_placeholder: l.search_placeholder  || "Zoek in notities...",
+      filter_all:         l.filter_all          || "Alle",
+      delete_title:       l.delete_title        || "Notitie verwijderen?",
+      delete_confirm:     l.delete_confirm      || "Weet je zeker dat je deze notitie wilt verwijderen?",
+      btn_delete:         l.btn_delete          || "Verwijderen",
+      modal_new:          l.modal_new           || "Nieuwe Notitie",
+      modal_edit:         l.modal_edit          || "Notitie bewerken",
+      markdown_hint:      l.markdown_hint       || "(ondersteunt Markdown)",
+      markdown_placeholder: l.markdown_placeholder || "Schrijf je notitie hier...",
+      task_placeholder:   l.task_placeholder    || "Taak omschrijving...",
+      item_placeholder:   l.item_placeholder    || "Item omschrijving...",
+      title_placeholder:  l.title_placeholder   || "Voer een titel in...",
+      image_upload:       l.image_upload        || "📷 Klik of sleep een afbeelding hier",
+      pin_yes:            l.pin_yes             || "Losmaken",
+      pin_no:             l.pin_no              || "Vastpinnen",
+      reminder_expired:   l.reminder_expired    || "(verlopen)",
+    };
   }
   getCardSize() { return 4; }
   static getStubConfig() { return { title: "📝 Notities" }; }
@@ -112,7 +151,7 @@ class NotesManagerCard extends HTMLElement {
 
     const all = document.createElement("button");
     all.className = "cat-btn" + (this._activeCategory === "all" ? " active" : "");
-    all.textContent = "Alle";
+    all.textContent = this._l.filter_all;
     all.addEventListener("click", () => { this._activeCategory = "all"; this._renderCategoryFilter(); this._renderNotes(); });
     bar.appendChild(all);
 
@@ -234,7 +273,7 @@ class NotesManagerCard extends HTMLElement {
         </div>
         <div class="search-bar">
           <span>🔍</span>
-          <input type="text" id="search-input" placeholder="Zoek in notities..." />
+          <input type="text" id="search-input" placeholder="${this._l.search_placeholder}" />
           <button class="clear-btn" id="clear-search">✕</button>
         </div>
         <div class="category-bar" id="category-bar"></div>
@@ -249,66 +288,66 @@ class NotesManagerCard extends HTMLElement {
           <h3 id="modal-title">Nieuwe Notitie</h3>
 
           <div class="type-toggle">
-            <button class="type-btn active" id="type-text-btn">📝 Tekst</button>
-            <button class="type-btn" id="type-check-btn">✅ Checklist</button>
-            <button class="type-btn" id="type-numbered-btn">🔢 Genummerd</button>
+            <button class="type-btn active" id="type-text-btn">${this._l.type_text}</button>
+            <button class="type-btn" id="type-check-btn">${this._l.type_checklist}</button>
+            <button class="type-btn" id="type-numbered-btn">${this._l.type_numbered}</button>
           </div>
 
           <label class="pin-toggle">
             <input type="checkbox" id="pin-input" />
-            📌 Vastpinnen bovenaan
+            ${this._l.pin_label}
           </label>
 
           <div class="form-group">
-            <label>Titel</label>
-            <input type="text" id="note-title-input" placeholder="Voer een titel in..." />
+            <label>${this._l.field_title}</label>
+            <input type="text" id="note-title-input" placeholder="${this._l.title_placeholder}" />
           </div>
 
           <div class="form-group" id="text-section">
-            <label>Inhoud <span style="font-weight:normal">(ondersteunt Markdown)</span></label>
-            <textarea id="note-content-input" placeholder="Schrijf je notitie hier...&#10;**vet**, *cursief*, # Kop, \`code\`, [link](url)"></textarea>
+            <label>${this._l.field_content} <span style="font-weight:normal">${this._l.markdown_hint}</span></label>
+            <textarea id="note-content-input" placeholder="${this._l.markdown_placeholder}"></textarea>
             <div class="hint">**vet** &nbsp;|&nbsp; *cursief* &nbsp;|&nbsp; # Kop &nbsp;|&nbsp; \`code\` &nbsp;|&nbsp; [tekst](url)</div>
           </div>
 
           <div class="form-group" id="checklist-section" style="display:none">
-            <label>Taken</label>
+            <label>${this._l.type_checklist}</label>
             <div class="checklist-editor" id="checklist-editor"></div>
-            <button class="add-item-btn" id="add-checklist-item">+ Taak toevoegen</button>
+            <button class="add-item-btn" id="add-checklist-item">${this._l.btn_add_task}</button>
           </div>
 
           <div class="form-group" id="numbered-section" style="display:none">
-            <label>Genummerde lijst</label>
+            <label>${this._l.type_numbered}</label>
             <div class="checklist-editor" id="numbered-editor"></div>
-            <button class="add-item-btn" id="add-numbered-item">+ Item toevoegen</button>
+            <button class="add-item-btn" id="add-numbered-item">${this._l.btn_add_item}</button>
           </div>
 
           <div class="form-group">
-            <label>📁 Categorie</label>
+            <label>${this._l.field_category}</label>
             <select id="category-select">
-              <option value="">— Geen categorie —</option>
-              <option value="__new__">➕ Nieuwe categorie...</option>
+              <option value="">${this._l.no_category}</option>
+              <option value="__new__">${this._l.new_category}</option>
             </select>
             <div id="category-new-wrap" style="margin-top:6px;display:none;">
-              <input type="text" id="category-new-input" placeholder="Naam nieuwe categorie..." />
+              <input type="text" id="category-new-input" placeholder="${this._l.category_placeholder}" />
             </div>
           </div>
 
           <div class="form-group">
-            <label>⏰ Herinnering (optioneel)</label>
+            <label>${this._l.field_reminder}</label>
             <input type="datetime-local" id="reminder-input" />
           </div>
 
           <div class="form-group">
-            <label>Afbeeldingen</label>
+            <label>${this._l.field_images}</label>
             <div class="image-upload-area" id="image-upload-area">
-              📷 Klik of sleep een afbeelding hier
+              ${this._l.image_upload}
               <input type="file" id="image-file-input" accept="image/*" multiple style="display:none" />
             </div>
             <div class="image-previews" id="image-previews"></div>
           </div>
 
           <div class="form-group">
-            <label>Kleur</label>
+            <label>${this._l.field_color}</label>
             <div class="color-picker" id="color-picker">
               <div class="color-option selected" data-color="yellow" style="background:#fff9c4" title="Geel"></div>
               <div class="color-option" data-color="blue" style="background:#e3f2fd" title="Blauw"></div>
@@ -320,8 +359,8 @@ class NotesManagerCard extends HTMLElement {
           </div>
 
           <div class="modal-actions">
-            <button class="btn btn-secondary" id="cancel-btn">Annuleren</button>
-            <button class="btn btn-primary" id="save-btn">Opslaan</button>
+            <button class="btn btn-secondary" id="cancel-btn">${this._l.btn_cancel}</button>
+            <button class="btn btn-primary" id="save-btn">${this._l.btn_save}</button>
           </div>
         </div>
       </div>
@@ -329,11 +368,11 @@ class NotesManagerCard extends HTMLElement {
       <!-- Delete Confirm Modal -->
       <div class="modal-overlay" id="confirm-modal">
         <div class="confirm-modal">
-          <h3>Notitie verwijderen?</h3>
-          <p>Weet je zeker dat je deze notitie wilt verwijderen?</p>
+          <h3>${this._l.delete_title}</h3>
+          <p>${this._l.delete_confirm}</p>
           <div class="modal-actions" style="justify-content:center;">
-            <button class="btn btn-secondary" id="confirm-cancel">Annuleren</button>
-            <button class="btn btn-primary" id="confirm-delete" style="background:#e53935">Verwijderen</button>
+            <button class="btn btn-secondary" id="confirm-cancel">${this._l.btn_cancel}</button>
+            <button class="btn btn-primary" id="confirm-delete" style="background:#e53935">${this._l.btn_delete}</button>
           </div>
         </div>
       </div>
@@ -396,7 +435,7 @@ class NotesManagerCard extends HTMLElement {
       const cb = document.createElement("input");
       cb.type = "checkbox"; cb.checked = checked;
       const inp = document.createElement("input");
-      inp.type = "text"; inp.placeholder = "Taak omschrijving..."; inp.value = text;
+      inp.type = "text"; inp.placeholder = this._l.task_placeholder; inp.value = text;
       inp.style.cssText = "flex:1;min-width:0;padding:8px 10px;border:1px solid #aaa;border-radius:5px;font-size:.9em;background:#fff;color:#000;box-sizing:border-box;font-family:inherit;";
       const btn = document.createElement("button");
       btn.title = "Verwijder"; btn.textContent = "🗑️";
@@ -417,7 +456,7 @@ class NotesManagerCard extends HTMLElement {
       const numBadge = document.createElement("span");
       numBadge.className = "num-badge";
       const inp = document.createElement("input");
-      inp.type = "text"; inp.placeholder = "Item omschrijving..."; inp.value = text;
+      inp.type = "text"; inp.placeholder = this._l.item_placeholder; inp.value = text;
       inp.style.cssText = "flex:1;min-width:0;padding:8px 10px;border:1px solid #aaa;border-radius:5px;font-size:.9em;background:#fff;color:#000;box-sizing:border-box;font-family:inherit;";
       const btn = document.createElement("button");
       btn.title = "Verwijder"; btn.textContent = "🗑️";
@@ -446,9 +485,9 @@ class NotesManagerCard extends HTMLElement {
     // Update category select
     const updateCategorySelect = (selectedCat = "") => {
       const sel = r.getElementById("category-select");
-      sel.innerHTML = `<option value="">— Geen categorie —</option>` +
+      sel.innerHTML = `<option value="">${this._l.no_category}</option>` +
         this._categories.map(c => `<option value="${c}" ${c === selectedCat ? "selected" : ""}>${c}</option>`).join("") +
-        `<option value="__new__">➕ Nieuwe categorie...</option>`;
+        `<option value="__new__">${this._l.new_category}</option>`;
       if (selectedCat && !this._categories.includes(selectedCat)) {
         // it's a new category typed before
         sel.value = "__new__";
@@ -469,7 +508,7 @@ class NotesManagerCard extends HTMLElement {
     // Open modal
     const openModal = (note = null) => {
       this._editingNote = note;
-      r.getElementById("modal-title").textContent = note ? "Notitie bewerken" : "Nieuwe Notitie";
+      r.getElementById("modal-title").textContent = note ? this._l.modal_edit : this._l.modal_new;
       r.getElementById("note-title-input").value = note?.title || "";
       r.getElementById("note-content-input").value = note?.content || "";
       r.getElementById("pin-input").checked = note?.pinned || false;
@@ -622,7 +661,7 @@ class NotesManagerCard extends HTMLElement {
     }
 
     if (!notes.length) {
-      grid.innerHTML = `<div class="empty-state"><div class="icon">${this._searchQuery ? "🔍" : "📋"}</div><p>${this._searchQuery ? `Geen notities gevonden voor '${this._searchQuery}'` : "Geen notities. Klik op + om te beginnen."}</p></div>`;
+      grid.innerHTML = `<div class="empty-state"><div class="icon">${this._searchQuery ? "🔍" : "📋"}</div><p>${this._searchQuery ? `${this._l.empty_search} '${this._searchQuery}'` : this._l.empty_state}</p></div>`;
       return;
     }
 
@@ -664,7 +703,7 @@ class NotesManagerCard extends HTMLElement {
       const imagesHtml = note.images?.length
         ? `<div class="note-images">${note.images.map(src => `<img src="${src}" data-src="${src}" class="note-img" />`).join("")}</div>` : "";
       const reminderHtml = reminder
-        ? `<div class="note-reminder ${reminder.expired ? "expired" : ""}">⏰ ${reminder.str}${reminder.expired ? " (verlopen)" : ""}</div>` : "";
+        ? `<div class="note-reminder ${reminder.expired ? "expired" : ""}">⏰ ${reminder.str}${reminder.expired ? " " + this._l.reminder_expired : ""}</div>` : "";
       const categoryHtml = note.category
         ? `<div class="note-category-badge">📁 ${note.category}</div>` : "";
 
@@ -675,7 +714,7 @@ class NotesManagerCard extends HTMLElement {
             <div class="note-title">${this._highlight(note.title, q)}</div>
           </div>
           <div class="note-actions">
-            <button class="pin-btn" title="${note.pinned ? "Losmaken" : "Vastpinnen"}">${note.pinned ? "📍" : "📌"}</button>
+            <button class="pin-btn" title="${note.pinned ? this._l.pin_yes : this._l.pin_no}">${note.pinned ? "📍" : "📌"}</button>
             <button class="edit-btn" title="Bewerken">✏️</button>
             <button class="delete-btn" title="Verwijderen">🗑️</button>
           </div>
@@ -707,7 +746,7 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: "notes-manager-card",
   name: "Notes Manager",
-  description: "Notities met categorieën, zoeken, vastpinnen, herinneringen, Markdown, checklists, genummerde lijsten en afbeeldingen.",
+  description: "Notes Manager - customizable notes with categories, search, pin, reminders, Markdown, checklists and numbered lists.",
   preview: true,
 });
 console.info(

@@ -3,7 +3,7 @@
 A custom Home Assistant integration to create, edit, and delete notes directly from your dashboard.
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)
 
 ---
 
@@ -26,6 +26,7 @@ A custom Home Assistant integration to create, edit, and delete notes directly f
 - ✅ Notes saved persistently in your HA config directory
 - ✅ Frontend JS auto-copied on every HA restart
 - ✅ Configurable card title
+- ✅ **Fully customizable labels** (multilingual support)
 - ✅ Automation support via HA services
 
 ---
@@ -73,6 +74,47 @@ Go to **Settings → Dashboards → Resources** and add:
 - **Type:** JavaScript module
 
 > 💡 The JS file is automatically copied to the correct location on every HA restart.
+Optionally customize all labels (e.g. English):
+
+```yaml
+type: custom:notes-manager-card
+title: "📝 My Notes"
+labels:
+  type_text: "📝 Text"
+  type_checklist: "✅ Checklist"
+  type_numbered: "🔢 Numbered"
+  field_title: "Title"
+  field_content: "Content"
+  field_category: "📁 Category"
+  field_reminder: "⏰ Reminder (optional)"
+  field_images: "Images"
+  field_color: "Color"
+  btn_save: "Save"
+  btn_cancel: "Cancel"
+  btn_add_task: "+ Add task"
+  btn_add_item: "+ Add item"
+  pin_label: "📌 Pin to top"
+  no_category: "— No category —"
+  new_category: "➕ New category..."
+  empty_state: "No notes. Click + to start."
+  search_placeholder: "Search notes..."
+  filter_all: "All"
+  delete_title: "Delete note?"
+  delete_confirm: "Are you sure you want to delete this note?"
+  btn_delete: "Delete"
+  modal_new: "New Note"
+  modal_edit: "Edit Note"
+  task_placeholder: "Task description..."
+  item_placeholder: "Item description..."
+  title_placeholder: "Enter a title..."
+  pin_yes: "Unpin"
+  pin_no: "Pin"
+  reminder_expired: "(expired)"
+```
+
+> 💡 All labels are optional — any label you omit will fall back to the Dutch default.
+
+
 
 ---
 
@@ -160,6 +202,9 @@ Notes are stored in:
 ---
 
 ## 📋 Changelog
+
+### v2.5.0
+- 🌍 Fully customizable labels via Lovelace config (multilingual support)
 
 ### v2.4.0
 - 🔢 Numbered list note type
