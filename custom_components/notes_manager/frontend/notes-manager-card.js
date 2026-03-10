@@ -3,7 +3,7 @@
  * v2.3.0 - Categories + Timezone fix
  */
 
-const CARD_VERSION = "2.3.1";
+const CARD_VERSION = "2.3.2";
 
 function renderMarkdown(text) {
   if (!text) return "";
@@ -440,7 +440,6 @@ class NotesManagerCard extends HTMLElement {
       r.getElementById("note-title-input").value = note?.title || "";
       r.getElementById("note-content-input").value = note?.content || "";
       r.getElementById("pin-input").checked = note?.pinned || false;
-      r.getElementById("category-input").value = note?.category || "";
       // TIMEZONE FIX: use local time conversion
       r.getElementById("reminder-input").value = isoToLocalInput(note?.reminder);
       r.getElementById("checklist-editor").innerHTML = "";
