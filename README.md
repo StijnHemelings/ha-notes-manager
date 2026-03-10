@@ -3,7 +3,7 @@
 A custom Home Assistant integration to create, edit, and delete notes directly from your dashboard.
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![Version](https://img.shields.io/badge/version-2.5.1-blue.svg)
+![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)
 
 ---
 
@@ -26,6 +26,7 @@ A custom Home Assistant integration to create, edit, and delete notes directly f
 - ✅ Notes saved persistently in your HA config directory
 - ✅ Frontend JS auto-copied on every HA restart
 - ✅ Configurable card title
+- ✅ **Duplicate notes**
 - ✅ **Fully customizable labels** (multilingual support)
 - ✅ Automation support via HA services
 
@@ -202,6 +203,9 @@ Notes are stored in:
 ---
 
 ## 📋 Changelog
+
+### v2.6.0
+- 📋 Duplicate notes (copy icon on each note card)
 
 ### v2.5.0
 - 🌍 Fully customizable labels via Lovelace config (multilingual support)

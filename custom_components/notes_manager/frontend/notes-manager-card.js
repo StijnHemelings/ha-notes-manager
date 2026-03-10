@@ -3,7 +3,7 @@
  * v2.3.0 - Categories + Timezone fix
  */
 
-const CARD_VERSION = "2.5.1";
+const CARD_VERSION = "2.6.0";
 
 function renderMarkdown(text) {
   if (!text) return "";
@@ -63,6 +63,7 @@ class NotesManagerCard extends HTMLElement {
       task_placeholder: "Taak omschrijving...", item_placeholder: "Item omschrijving...",
       title_placeholder: "Voer een titel in...", image_upload: "📷 Klik of sleep een afbeelding hier",
       pin_yes: "Losmaken", pin_no: "Vastpinnen", reminder_expired: "(verlopen)",
+      btn_edit: "Bewerken", btn_duplicate: "Dupliceren", duplicate_prefix: "Kopie van",
     };
   }
 
@@ -117,6 +118,9 @@ class NotesManagerCard extends HTMLElement {
       pin_yes:            l.pin_yes             || "Losmaken",
       pin_no:             l.pin_no              || "Vastpinnen",
       reminder_expired:   l.reminder_expired    || "(verlopen)",
+      btn_edit:           l.btn_edit            || "Bewerken",
+      btn_duplicate:      l.btn_duplicate       || "Dupliceren",
+      duplicate_prefix:   l.duplicate_prefix    || "Kopie van",
     };
   }
   getCardSize() { return 4; }
@@ -635,6 +639,21 @@ class NotesManagerCard extends HTMLElement {
     this._togglePin = async (note) => { await this._saveNote({ pinned: !note.pinned }, note.id); };
   }
 
+  async _duplicateNote(note) {
+    const dupeData = {
+      title: `${this._l.duplicate_prefix} ${note.title}`,
+      content: note.content || "",
+      color: note.color || "yellow",
+      type: note.type || "text",
+      checklist: note.checklist ? JSON.parse(JSON.stringify(note.checklist)) : [],
+      images: note.images ? [...note.images] : [],
+      pinned: false,
+      category: note.category || "",
+      reminder: null,
+    };
+    await this._saveNote(dupeData);
+  }
+
   _readImageFile(file, pendingImages, callback) {
     const reader = new FileReader();
     reader.onload = e => { pendingImages.push(e.target.result); callback(); };
@@ -734,8 +753,9 @@ class NotesManagerCard extends HTMLElement {
           </div>
           <div class="note-actions">
             <button class="pin-btn" title="${note.pinned ? this._l.pin_yes : this._l.pin_no}">${note.pinned ? "📍" : "📌"}</button>
-            <button class="edit-btn" title="Bewerken">✏️</button>
-            <button class="delete-btn" title="Verwijderen">🗑️</button>
+            <button class="edit-btn" title="${this._l.btn_edit || 'Bewerken'}">✏️</button>
+            <button class="dupe-btn" title="${this._l.btn_duplicate || 'Dupliceren'}">📋</button>
+            <button class="delete-btn" title="${this._l.btn_delete}">🗑️</button>
           </div>
         </div>
         ${categoryHtml}
@@ -746,6 +766,7 @@ class NotesManagerCard extends HTMLElement {
       `;
 
       card.querySelector(".pin-btn").addEventListener("click", e => { e.stopPropagation(); this._togglePin(note); });
+      card.querySelector(".dupe-btn").addEventListener("click", e => { e.stopPropagation(); this._duplicateNote(note); });
       card.querySelector(".edit-btn").addEventListener("click", e => { e.stopPropagation(); this._openModal(note); });
       card.querySelector(".delete-btn").addEventListener("click", e => { e.stopPropagation(); this._triggerDelete(note.id); });
       card.querySelectorAll("input[type=checkbox][data-note]").forEach(cb => {
